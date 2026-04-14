@@ -1,0 +1,104 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* background */
+html {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='2000' height='560'%3e%3cpath fill='rgba(156,99,255,1)' d='M0,196 C133,247 400,438 667,454 C933,469 1067,264 1334,272 C1600,280 1866,449 2000,494 L2000 560 L0 560z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: bottom;
+  font-family: Arial, sans-serif;
+}
+
+/* landing */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 20px;
+}
+
+/* layout */
+body {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  height: 100vh;
+}
+
+/* modal */
+.modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+/* video */
+.video-holder {
+  position: relative;
+  padding: 60px;
+}
+
+#video {
+  width: 100%;
+  height: calc(100vh - 120px);
+  background: black;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+#my-video {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  outline: 2px solid violet;
+}
+
+/* chat */
+.chat-holder {
+  background: white;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.msg {
+  background: #eee;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+/* input */
+.input {
+  position: fixed;
+  bottom: 0;
+  width: 25%;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+button {
+  padding: 10px;
+  background: blueviolet;
+  color: white;
+  border-radius: 10px;
+  border: none;
+}

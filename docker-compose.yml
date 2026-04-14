@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: ./server
+    container_name: omegle-server
+    ports:
+      - "8000:8000"
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: omegle-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
