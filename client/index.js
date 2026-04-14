@@ -8,7 +8,6 @@ let roomid;
 
 document.addEventListener("DOMContentLoaded", () => {
   const startBtn = document.getElementById("start-btn");
-
   startBtn.addEventListener("click", startApp);
 });
 
@@ -21,8 +20,8 @@ function startApp() {
     </div>
 
     <div class="video-holder">
-      <video autoplay id="my-video"></video>
-      <video autoplay id="video"></video>
+      <video autoplay muted playsinline id="my-video"></video>
+      <video autoplay playsinline id="video"></video>
     </div>
 
     <div class="chat-holder">
@@ -41,6 +40,7 @@ function initSocket() {
   const myVideo = document.getElementById('my-video');
   const strangerVideo = document.getElementById('video');
   const button = document.getElementById('send');
+  const inputBox = document.querySelector('input');
 
   socket = io('/');
 
@@ -52,12 +52,22 @@ function initSocket() {
     });
   });
 
-  socket.on('remote-socket', (id) => {
+  socket.on('remote-socket', async (id) => {
     remoteSocket = id;
 
     document.querySelector('.modal').style.display = 'none';
 
-    peer = new RTCPeerConnection();
+    // ✅ FINAL FIX: STUN + TURN
+    peer = new RTCPeerConnection({
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        }
+      ]
+    });
 
     peer.onnegotiationneeded = async () => {
       if (type === 'p1') {
@@ -67,24 +77,28 @@ function initSocket() {
       }
     };
 
-    peer.onicecandidate = e => {
+    peer.onicecandidate = (e) => {
       if (e.candidate) {
         socket.emit('ice:send', { candidate: e.candidate });
       }
     };
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        myVideo.srcObject = stream;
+    // ✅ Start camera BEFORE negotiation (important)
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    });
 
-        stream.getTracks().forEach(track => {
-          peer.addTrack(track, stream);
-        });
+    myVideo.srcObject = stream;
 
-        peer.ontrack = e => {
-          strangerVideo.srcObject = e.streams[0];
-        };
-      });
+    stream.getTracks().forEach(track => {
+      peer.addTrack(track, stream);
+    });
+
+    peer.ontrack = (e) => {
+      console.log("Received remote stream");
+      strangerVideo.srcObject = e.streams[0];
+    };
   });
 
   socket.on('sdp:reply', async ({ sdp }) => {
@@ -105,8 +119,10 @@ function initSocket() {
 
   socket.on('roomid', id => roomid = id);
 
-  button.onclick = () => {
-    let input = document.querySelector('input').value;
+  // ✅ SEND MESSAGE
+  function sendMessage() {
+    const input = inputBox.value.trim();
+    if (!input) return;
 
     socket.emit('send-message', input, type, roomid);
 
@@ -114,12 +130,19 @@ function initSocket() {
       <div><b>You:</b> ${input}</div>
     `;
 
-    document.querySelector('input').value = '';
-  };
+    inputBox.value = '';
+  }
+
+  button.onclick = sendMessage;
+
+  // ✅ ENTER KEY SUPPORT
+  inputBox.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
 
   socket.on('get-message', (input) => {
     document.querySelector('.wrapper').innerHTML += `
       <div><b>Stranger:</b> ${input}</div>
     `;
   });
-} 
+}

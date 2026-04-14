@@ -8,12 +8,4 @@ services:
     ports:
       - "8000:8000"
 
-  client:
-    build:
-      context: .
-      dockerfile: client/Dockerfile
-    container_name: omegle-client
-    ports:
-      - "80:80"
-    depends_on:
-      - server
+
