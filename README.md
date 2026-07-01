@@ -1,5 +1,4 @@
 
-# 📘 Deployment Guide: Omegle Clone with Video on AWS EC2
 
 ## 🎯 Objective
 
